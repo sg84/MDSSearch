@@ -1,0 +1,33 @@
+{
+	"extension": {
+		"name": "Multi Domain IP Search",
+		"product-url": "https://github.com/sg84/MDIPS",
+		"provider": "stuartg@checkpoint.com",
+		"version": "0.1"
+	},
+	"custom-data": {
+		"display-level": "developer",
+		"theme": "light"
+	},
+	"locations": [{
+		"location": "global-pane",
+		"relevant-types": ["*"],
+		"ui-element": {
+				"type": "tab",
+				"caption": "Global IP Search",
+				"tooltip": "Search all domains for a specific IP address",
+				"update-title-from-page": "false",
+				"update-icon-from-page": "true",
+				"action": {
+					"details-level": "full",
+					"method": "get",
+					"trigger-id": "editor-common-get",
+					"url": "index.html"
+				}
+		}
+	}
+	],
+	"requested-permissions": {
+		"client": ["get-read-only-session"]
+	}
+}
