@@ -27,3 +27,9 @@ It has two components:
  * This is setup to use API key authentication in R80.40. It could be modified for R80.30 using regular credential auth fairly simply. 
  
 Let me know if you have any thoughts or issues!
+
+## CORS (and why we need a Docker image acting as a proxy)
+
+CORS - Cross Origin Resource Sharing, is a mechanism which helps control how data from a specific origin can be shared with a third party. (quick and dirty example - Facebook would use CORS to prevent some third party Javascript sending your data Facebook data elsewhere). 
+This causes issues with SmartConsole extensions because you cannot currently configure your SMS to send CORS headers to the SMEX browser window to allow the requests to be sent elsewhere (ie, your docker image). 
+The workaround is to use a proxy on the origin of the javascript so there are no restrictions in the script talking to its own origin. Then that proxy can issue a unique connection request to the API server without CORS being a factor. 
