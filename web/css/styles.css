@@ -21,6 +21,13 @@ div {
 	margin: 0;
 	/*margin-right: auto; margin-left: auto;*/
 }
+.ipAddress {
+	width: 100%;
+}
+
+.searchBtn {
+	border: 1px;
+}
 
 .container
 {
@@ -90,7 +97,6 @@ div {
 	font-size: 1.25rem; /* 20 */
 	background-color: #FFFFFF;
 	position: relative;
-	    display:flex;
 }
 .box.has-advanced-upload
 {
@@ -123,7 +129,10 @@ div {
 	display: block;
 	margin-bottom: 40px;
 }
+.inputs {
+	width: 100%;
 
+}
 .box.is-uploading .box__input,
 .box.is-success .box__input,
 .box.is-error .box__input
@@ -331,7 +340,6 @@ input, select {
 	font-weight: 500;
 	color: #2E3F58;
 	background-color: transparent;
-	border: 0;
 }
 
 input[type="submit"]:hover,

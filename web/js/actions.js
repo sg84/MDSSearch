@@ -4,24 +4,25 @@ var SMS_API_ENDPOINT = DOCKER_IP + "/smc";
 
 function searchBtnClick(param) {
 	// Retrieve context for API endpoint
-	var context = smxProxy.sendRequest("get-context", null, "onContext");
+	context = smxProxy.sendRequest("get-context", null, "onContext");
 	$("#searchResults").html("<p><b>Searching, please wait...</b></p>");
 }
 
 function onContext(context) {
 	// Extract API endpoint
 	// Query domains - we can use context SID here in global domain
-	var headers = {"x-chkp-sid": context['management-server-api']['sid'],
-	"Content-Type": "application/json"};
-	var params = {};
+	
 	var command = "show-domains";
-	chainStart(command, params, headers);
+	var headers = {"x-chkp-sid": context['management-server-api']['sid'],
+	"Content-Type": "application/json", "x-chkp-smc": context['management-server-api']['url'] + "/" + command};
+	var params = {};
+	chainStart(command, params, headers, context);
 	//alert(JSON.stringify(domains));
 	
 
 }
 
-function chainStart(command, params, headers) {
+function chainStart(command, params, headers, context) {
 	// Stage 1 - get domain UIDs
     var settings = {
 		"url": SMS_API_ENDPOINT + "/" + command,
@@ -41,13 +42,15 @@ function chainStart(command, params, headers) {
         }
         
         var session_ids = [];
-        for (i = 0;i < found_domains.length; i++){
+        
+        $("#searchResults").empty();
+	$("#searchResults").append("<table width='100%' id='resultsTable'><tr><thead><th>Hostname</th><th>IP Address</th><th>Domain</th></thead></tr><tbody></tbody></table>");
+	for (i = 0;i < found_domains.length; i++){
             // Use each domain UID to get a SID and search for the given IP
             //console.log("working on " + found_domains[i]['uid']);
-            $("#searchResults").empty();
 	    var params = {"domain": found_domains[i]['uid'], "api-key": API_KEY};
-            var headers = {"Content-Type": "application/json"};
             var command = "login";
+            var headers = {"Content-Type": "application/json", "x-chkp-smc": context['management-server-api']['url'] + "/" + command};
             var settings = {
                 "url": SMS_API_ENDPOINT + "/" + command,
                 "method": "POST",
@@ -60,8 +63,8 @@ function chainStart(command, params, headers) {
                 // Stage 3 - use SID to query objects in the domain
             	
 		var params = {"type": "host", "ip-only": "true", "filter": $("#ipAddress").val()};
-		var headers = {"Content-Type": "application/json", "x-chkp-sid": response['sid']};
 		var command = "show-objects";
+		var headers = {"Content-Type": "application/json", "x-chkp-sid": response['sid'], "x-chkp-smc": context['management-server-api']['url'] + "/" + command};
 		var settings = {
                 "url": SMS_API_ENDPOINT + "/" + command,
                 "method": "POST",
@@ -73,15 +76,14 @@ function chainStart(command, params, headers) {
 		
 			objects_found = response['objects'];
 			for (o = 0; o < objects_found.length; o++){
-				$("#searchResults").append("<b>Hostname</b> - " + objects_found[o]['name'] + "<br/><b>IP Address</b> - " + 
-					objects_found[o]['ipv4-address'] + "<br/>");
+				$("#resultsTable").append("<tr><td>" + objects_found[o]['name'] + "</td>" + "<td>" + objects_found[o]['ipv4-address'] + "</td>");
 					for (s = 0; s < found_domains.length; s++){
 						if (found_domains[s]['uid'] == objects_found[o]['domain']['uid']){
-							$("#searchResults").append("<b>Domain</b> - " + found_domains[s]['name'] + "<br/><br/>");
+							$("#resultsTable td:last").after("<td>" + found_domains[s]['name'] + "</td></tr>");
+							break;
 						}
 					}
 			}
-		
 		});
 
 	    });
